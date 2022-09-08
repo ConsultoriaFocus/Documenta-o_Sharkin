@@ -1,0 +1,15 @@
+@startuml Sharkin
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Component.puml
+
+Person(user, "Shark Usuário", "O Shark que vai utilizar o sistema")
+
+System(sk1, "Sistema do Sharkin", "Permite o Shark realizar Sharkin e Sharkout")
+Component(plan, "Sistema de Planilha","arquivo.csv", "Sistema para exportação de planilhas para controle de mebros")
+' ContainerDb(db, "Banco de Dados", "Informações de membros e plantões")
+
+Rel(user, sk1, "Usa")
+Rel(sk1, plan, "Usa")
+Rel(plan, user, "Devolve")
+Rel(sk1, user, "Devolve")
+@enduml

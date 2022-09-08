@@ -1,0 +1,51 @@
+@startuml Back
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Component.puml
+
+Container(web_app, "Aplicação Web", "reactJs, nodeJs", "Permite o Shark realizar Sharkin e Sharkout")
+
+Container_Boundary(middleware, "MiddleWares") {
+    Container(middleware_is_plantao, "In/Out Plantão", "Javascript","Middleware de verificação se está ou não no plantão")
+    Container(middleware_turn_in_off_plantao, "Turn In/Off Plantão", "Javascript","Middleware de entrada e saída de plantão")
+    ' Container(middleware_min_plantao, "Mínimo Plantão", "Javascript","Middleware de verificação se já tem pessoas demais no plantão plantão")
+    Container(middleware_auth, "Auth Login", "Javascript","Middleware de Autenticação de Login")
+    Container(middleware_all_members, "All Members", "Javascript","Middleware que confere se todos os membros já estão cadastrados")
+    Container(middleware_email_focus, "Email Focus", "Javascript", "Middleware de verificação se o email é do domínio da Focus")
+}
+Container_Boundary(routes, "Routes") {
+    Container_Boundary(routes_sharkin, "Sharkin", "Rotas do sistema") {
+        Container(routes_sharkin_check_in_out, "/sharkin /sharkout","router Js" ,"Rotas de Checkin e Checkout")
+        Container(routes_sharkin_list, "/list","router Js", "Rota para listagem de sharkins" )
+
+    }
+    Container_Boundary(routes_user, "Usuário", "Rotas do Usuário") {
+        Container(routes_user_register, "/register", "router Js", "Rota de Registro de novo Usuário")
+        Container(routes_user_login, "/login", "router Js", "Rota de Login de Usuário")
+    }
+}
+
+Container_Boundary(bda, "Operações do Banco de dados") {
+    ContainerDb(db, "Banco de Dados", "mongoDb","Informações de membros e plantões")
+    Component(dba_user_pass, "isCorrectPassword", "Validação com bcript", "Verifica se a senha está correta")
+}
+
+' Relação de login
+Rel(routes_user_login, dba_user_pass, "confere")
+Rel(dba_user_pass, db, "consome")
+
+' Relaçãode Sharkin e Sharkout
+Rel(routes_sharkin_check_in_out, middleware_auth, "autentica")
+Rel(routes_sharkin_check_in_out, middleware_is_plantao, "confere")
+Rel(routes_sharkin_check_in_out, middleware_turn_in_off_plantao, "altera")
+
+Rel(middleware_turn_in_off_plantao, db, "requisita alteração")
+
+Rel(routes_sharkin_list, middleware_auth, "autentica")
+
+' Relação de Registro
+Rel(routes_user_register, middleware_all_members, "verifica")
+Rel(routes_user_register, middleware_email_focus, "verifica")
+
+' Aplicação Consumindo as rotas
+Rel(web_app, routes, "utiliza")
+@enduml

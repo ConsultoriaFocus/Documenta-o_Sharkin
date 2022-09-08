@@ -1,0 +1,26 @@
+@startuml Sharkin
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Component.puml
+
+Person(user,  "Shark Usuário", "O Shark que vai utilizar o sistema")
+System_Boundary(sk1, "Sistema do Sharkin") {
+    Container(web_app, "Aplicação Web", "nodeJs", "Permite o Shark realizar Sharkin e Sharkout")
+    Container(lg_pg, "Página de Login", "reactJs", "Permite o usuário fazer Login no sistema")
+    Container(plant_pg, "Página de Plantões", "reactJs", "Permite Visualização de Plantões, e realização de Check-in e Chek-out")
+}
+ContainerDb(db, "Banco de Dados","mongoDb","Informações de membros e plantões")
+Component(plan, "Sistema de Planilha","arquivo.csv", "Sistema para exportação de planilhas para controle de mebros")
+
+Rel(lg_pg, web_app, "Valida login")
+Rel(lg_pg, plant_pg, "Vai para")
+
+
+Rel(web_app, plan, "Request")
+Rel(web_app, user, "Download")
+Rel(plan, web_app, "Response")
+
+Rel(plant_pg, web_app, "Altera Status do usuário")
+Rel(user, web_app, "Uses", "HTTPS")
+
+Rel(web_app, db, "Solocita Alteração")
+@enduml
